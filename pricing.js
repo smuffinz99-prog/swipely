@@ -64,3 +64,15 @@
   if (document.readyState !== 'loading') apply();
   else document.addEventListener('DOMContentLoaded', apply);
 })();
+
+/* Cloudflare Web Analytics — privacy-friendly, cookieless pageview tracking.
+ * Loaded here because every page already includes pricing.js. To change the
+ * tracked site, replace the token below with the one from your Cloudflare
+ * Web Analytics dashboard. View stats at dash.cloudflare.com. */
+(function () {
+  var s = document.createElement('script');
+  s.defer = true;
+  s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+  s.setAttribute('data-cf-beacon', '{"token": "666e4835ac074d82939dfeb2c4113077"}');
+  (document.head || document.documentElement).appendChild(s);
+})();
