@@ -20,13 +20,14 @@
     "mainEntity": [
       {"@type":"Question","name":"How do I make a carousel for LinkedIn?","acceptedAnswer":{"@type":"Answer","text":"Open Swipely, pick a theme, type one idea per slide, then download all slides as images and upload them to LinkedIn as a document or image post."}},
       {"@type":"Question","name":"What size should a LinkedIn carousel be?","acceptedAnswer":{"@type":"Answer","text":"A 4:5 portrait at 1080x1350 pixels fills the most feed space on LinkedIn. Swipely exports at exactly this size."}},
-      {"@type":"Question","name":"Is Swipely free?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can make and download LinkedIn carousels for free. A $8/month Pro plan removes the watermark and unlocks premium themes."}}
+      {"@type":"Question","name":"Is Swipely free?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can make and download LinkedIn carousels for free. A $6/month Pro plan removes the watermark and unlocks premium themes."}}
     ]
   }
   </script>
   <link rel="stylesheet" href="pages.css" />
 </head>
 <body>
+  <div class="announce">✦ Pro is just <span data-usd="6"></span>/mo — unlimited &amp; watermark-free. <a href="app.html">Go Pro →</a></div>
   <header>
     <a class="logo" href="index.html">Swipe<span>ly</span></a>
     <div class="spacer"></div>
@@ -77,7 +78,7 @@
         <dt>What size should a LinkedIn carousel be?</dt>
         <dd>1080×1350 (4:5 portrait) fills the most feed space. Swipely exports at exactly this size.</dd>
         <dt>Is it really free?</dt>
-        <dd>Yes — make and download carousels free. Pro ($8/mo) removes the small watermark and unlocks premium themes.</dd>
+        <dd>Yes — make and download carousels free. Pro (<span data-usd="6"></span>/mo) removes the small watermark and unlocks premium themes.</dd>
       </dl>
     </section>
 
@@ -112,5 +113,6 @@
     </div>
   </footer>
   <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+  <script src="pricing.js"></script>
 </body>
 </html>

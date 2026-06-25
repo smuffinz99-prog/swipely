@@ -7,7 +7,7 @@ no per-user cost — so it deploys to any free static host.
 ## Why this exists (the business)
 
 - **Product:** free carousel/quote-graphic maker (capped at 2 carousels/day),
-  paid "Pro" tier ($8/mo) goes unlimited, removes the watermark, and unlocks the
+  paid "Pro" tier ($6/mo) goes unlimited, removes the watermark, and unlocks the
   premium gradient themes.
 - **Growth loop (the whole point):** every free export carries a small
   *"Made with Swipely"* mark. Creators post those graphics publicly → their
@@ -48,7 +48,7 @@ Any static host works. Easiest:
 
 ## Roadmap (in priority order)
 
-1. **Stripe Pro tier ($8/mo)** — flip `state.isPro` after checkout to drop the
+1. **Stripe Pro tier ($6/mo)** — flip `state.isPro` after checkout to drop the
    watermark, unlock `pro: true` themes, and lift the daily cap. Use Stripe
    Payment Links + a tiny serverless function (or Stripe + Cloudflare Workers) to
    stay near $0. Note: the free daily cap (`FREE_DAILY_EXPORTS` in `app.js`) is

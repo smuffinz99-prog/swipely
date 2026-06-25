@@ -11,11 +11,11 @@
   var STORAGE_KEY = 'swipely.project.v1';
   var USAGE_KEY = 'swipely.usage.v1';
   var FREE_DAILY_EXPORTS = 2;     // free plan: carousels (downloads) per day before Pro
-  var PRO_PRICE = '$8';           // Pro price, shown in the upsell + watermark note
+  var PRO_PRICE = '$6';           // Pro price, shown in the upsell + watermark note
   var PRO_KEY = 'swipely.pro.v1'; // persisted Pro flag (survives reloads, separate from project)
 
   // ── Checkout (Stripe Payment Link) ───────────────────────────────────────────
-  // To go live: in the Stripe Dashboard create a Payment Link for the $8/mo Pro
+  // To go live: in the Stripe Dashboard create a Payment Link for the $6/mo Pro
   // subscription, set its post-payment redirect to:  <your-domain>/app.html?pro=success
   // then paste the link URL below. Until then, "Get Pro" falls back to Preview.
   // This is the only step that needs the account owner — ~5 minutes, no code.

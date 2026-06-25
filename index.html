@@ -32,7 +32,7 @@
     "@type": "FAQPage",
     "mainEntity": [
       {"@type":"Question","name":"What is Swipely?","acceptedAnswer":{"@type":"Answer","text":"Swipely is a free, browser-based tool for making swipeable carousels and quote graphics for LinkedIn and Instagram. Pick a theme, type your text, and download ready-to-post slides."}},
-      {"@type":"Question","name":"Is Swipely free?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can make and download carousels for free with no signup. A $8/month Pro plan removes the watermark and unlocks premium themes and square export."}},
+      {"@type":"Question","name":"Is Swipely free?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can make and download carousels for free with no signup. A $6/month Pro plan removes the watermark and unlocks premium themes and square export."}},
       {"@type":"Question","name":"What size are the carousels?","acceptedAnswer":{"@type":"Answer","text":"Swipely exports 1080x1350 (4:5 portrait) and 1080x1080 (1:1 square) — the sizes that fill the feed on LinkedIn and Instagram."}},
       {"@type":"Question","name":"Do I need design skills or an account?","acceptedAnswer":{"@type":"Answer","text":"No. There's no signup and no design skills required. You type your text, pick a theme, and Swipely handles the layout."}}
     ]
@@ -61,6 +61,8 @@
     .btn.primary:hover { filter:brightness(1.08); }
     .btn.big { padding:15px 28px; font-size:17px; }
 
+    .announce { background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; text-align:center; font-size:14px; font-weight:600; padding:9px 16px; }
+    .announce a { color:#fff; text-decoration:underline; white-space:nowrap; }
     .hero { text-align:center; padding:64px 0 40px; }
     .hero h1 { font-size:54px; line-height:1.05; letter-spacing:-.03em; margin:0 0 18px; }
     .hero h1 .grad { background:linear-gradient(135deg,#818cf8,#c084fc); -webkit-background-clip:text; background-clip:text; color:transparent; }
@@ -118,6 +120,7 @@
   </style>
 </head>
 <body>
+  <div class="announce">✦ Pro is just <span data-usd="6"></span>/mo — unlimited carousels, no watermark, premium themes. <a href="app.html">Go Pro →</a></div>
   <div class="wrap">
     <header>
       <div class="logo">Swipe<span>ly</span></div>
@@ -190,7 +193,8 @@
         <div class="plan pro">
           <div class="tag">MOST POPULAR</div>
           <h3>Pro</h3>
-          <div class="price">$8<span>/mo</span></div>
+          <div class="price"><span data-usd="6"></span><span>/mo</span></div>
+          <div data-ccy-note style="font-size:12px;color:var(--muted);margin:-6px 0 10px;"></div>
           <ul>
             <li>Unlimited carousels &amp; downloads</li>
             <li>No watermark</li>
@@ -199,7 +203,7 @@
             <li>Square (1:1) export size</li>
             <li>Priority new features</li>
           </ul>
-          <a class="btn primary" href="app.html" style="width:100%;text-align:center;">Go Pro — $8/mo</a>
+          <a class="btn primary" href="app.html" style="width:100%;text-align:center;">Go Pro — <span data-usd="6"></span>/mo</a>
         </div>
       </div>
     </div>
@@ -215,7 +219,7 @@
         </div>
         <div style="border-top:1px solid var(--line);padding:18px 0;">
           <h3 style="margin:0 0 6px;font-size:18px;">Is Swipely free?</h3>
-          <p style="margin:0;color:var(--muted);">Yes — make and download carousels free, no signup. Pro ($8/mo) removes the watermark and unlocks premium themes and square export.</p>
+          <p style="margin:0;color:var(--muted);">Yes — make and download carousels free, no signup. Pro (<span data-usd="6"></span>/mo) removes the watermark and unlocks premium themes and square export.</p>
         </div>
         <div style="border-top:1px solid var(--line);padding:18px 0;">
           <h3 style="margin:0 0 6px;font-size:18px;">What size are the carousels?</h3>
@@ -231,9 +235,12 @@
 
   <footer>
     <div class="wrap">
-      <div style="margin-bottom:12px;">
+      <div style="margin-bottom:12px;line-height:2;">
         <a href="linkedin-carousel-maker.html" style="color:var(--muted);text-decoration:none;margin-right:18px;">LinkedIn carousel maker</a>
         <a href="instagram-carousel-maker.html" style="color:var(--muted);text-decoration:none;margin-right:18px;">Instagram carousel maker</a>
+        <a href="tiktok-carousel-maker.html" style="color:var(--muted);text-decoration:none;margin-right:18px;">TikTok carousel maker</a>
+        <a href="carousel-templates.html" style="color:var(--muted);text-decoration:none;margin-right:18px;">Carousel templates</a>
+        <a href="quote-graphics-maker.html" style="color:var(--muted);text-decoration:none;margin-right:18px;">Quote graphics maker</a>
         <a href="canva-alternative.html" style="color:var(--muted);text-decoration:none;">Canva alternative</a>
       </div>
       © <span id="yr"></span> Swipely · Made for creators who ship.
@@ -241,5 +248,6 @@
   </footer>
 
   <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+  <script src="pricing.js"></script>
 </body>
 </html>

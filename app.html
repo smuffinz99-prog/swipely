@@ -96,7 +96,7 @@
 
       <div class="wm-note" id="watermarkNote">
         <span>✦</span>
-        <div>Free plan: <b>2 carousels/day</b>, with a small <b>“Made with Swipely”</b> mark. Pro ($8/mo) removes the mark, unlocks premium themes, and goes unlimited.</div>
+        <div>Free plan: <b>2 carousels/day</b>, with a small <b>“Made with Swipely”</b> mark. Pro (<span data-usd="6"></span>/mo) removes the mark, unlocks premium themes, and goes unlimited.</div>
       </div>
     </section>
   </div>
@@ -106,7 +106,8 @@
     <div class="modal">
       <button class="modal-x" id="upsellClose" aria-label="Close">×</button>
       <div class="modal-badge">✦ Swipely Pro</div>
-      <div class="modal-price">$8<span>/month</span></div>
+      <div class="modal-price"><span data-usd="6"></span><span>/month</span></div>
+      <div class="modal-ccy" data-ccy-note></div>
       <p class="modal-reason" id="upsellReason"></p>
       <ul class="modal-list">
         <li>Unlimited carousels &amp; downloads</li>
@@ -116,7 +117,7 @@
         <li>Square (1:1) export size</li>
         <li>Priority access to new features</li>
       </ul>
-      <button class="btn primary modal-cta" id="upsellGetPro">Get Pro — $8/mo</button>
+      <button class="btn primary modal-cta" id="upsellGetPro">Get Pro — <span data-usd="6"></span>/mo</button>
       <div class="modal-note" id="upsellNote"></div>
       <button class="modal-preview" id="upsellPreview">Preview Pro features →</button>
     </div>
@@ -124,5 +125,6 @@
 
   <script src="templates.js"></script>
   <script src="app.js"></script>
+  <script src="pricing.js"></script>
 </body>
 </html>

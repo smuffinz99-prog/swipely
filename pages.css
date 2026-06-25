@@ -8,6 +8,8 @@ body { margin:0; background:var(--bg); color:var(--text);
 a { color:inherit; }
 .wrap { max-width:840px; margin:0 auto; padding:0 24px; }
 
+.announce { background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; text-align:center; font-size:14px; font-weight:700; padding:9px 16px; }
+.announce a { color:#fff; text-decoration:underline; white-space:nowrap; }
 header { display:flex; align-items:center; gap:16px; padding:20px 0; max-width:840px; margin:0 auto; padding-left:24px; padding-right:24px; }
 .logo { font-weight:800; font-size:22px; letter-spacing:-.02em; text-decoration:none; }
 .logo span { color:var(--accent-2); }
