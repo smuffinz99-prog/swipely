@@ -1,0 +1,552 @@
+/* Swipely editor — vanilla JS, no build step, no runtime dependencies.
+ * Everything renders client-side to a <canvas>, so there is zero per-user
+ * server cost. Slides export as 1080x1350 PNGs (the 4:5 portrait size that
+ * looks right on both LinkedIn and Instagram).
+ */
+(function () {
+  'use strict';
+
+  var BRAND = 'Swipely';          // change this one constant to rebrand everything
+  var W = 1080, H = 1350;         // export resolution (4:5 portrait)
+  var STORAGE_KEY = 'swipely.project.v1';
+  var USAGE_KEY = 'swipely.usage.v1';
+  var FREE_DAILY_EXPORTS = 2;     // free plan: carousels (downloads) per day before Pro
+  var PRO_PRICE = '$8';           // Pro price, shown in the upsell + watermark note
+  var PRO_KEY = 'swipely.pro.v1'; // persisted Pro flag (survives reloads, separate from project)
+
+  // ── Checkout (Stripe Payment Link) ───────────────────────────────────────────
+  // To go live: in the Stripe Dashboard create a Payment Link for the $8/mo Pro
+  // subscription, set its post-payment redirect to:  <your-domain>/app.html?pro=success
+  // then paste the link URL below. Until then, "Get Pro" falls back to Preview.
+  // This is the only step that needs the account owner — ~5 minutes, no code.
+  var PRO_CHECKOUT_URL = '';      // e.g. 'https://buy.stripe.com/xxxxxxxx'
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  var state = {
+    templateId: 'midnight',
+    brandName: 'Your Name',
+    brandHandle: '@yourhandle',
+    textSize: 'M',                // S | M | L
+    format: 'portrait',           // portrait | square  (square is Pro)
+    brand: { custom: false, bg: '#0f172a', title: '#ffffff', accent: '#38bdf8' }, // Pro custom colors
+    isPro: false,                 // flips when Stripe/paid tier lands
+    current: 0,
+    slides: [
+      { title: '5 lessons that\ndoubled my reach', body: 'Swipe to steal the exact playbook I used to grow from 0 to 50k in 6 months. →' },
+      { title: 'Lesson 1', body: 'Hook in the first 3 words or you have already lost. People decide to swipe in under a second.' },
+      { title: 'Lesson 2', body: 'One idea per slide. Crowded slides get skipped. White space is not wasted space.' },
+      { title: 'Found this useful?', body: 'Follow for a new playbook every week. And repost the first slide to help someone else.' },
+    ],
+  };
+
+  var SIZE_SCALE = { S: 0.85, M: 1, L: 1.18 };
+
+  // ── DOM refs ─────────────────────────────────────────────────────────────────
+  var $ = function (id) { return document.getElementById(id); };
+  var canvas = $('canvas');
+  var ctx = canvas.getContext('2d');
+  canvas.width = W; canvas.height = H;
+
+  // Export formats. Square is a Pro size; portrait 4:5 is the free default.
+  var FORMATS = {
+    portrait: { w: 1080, h: 1350, label: 'Portrait 4:5', pro: false },
+    square:   { w: 1080, h: 1080, label: 'Square 1:1', pro: true },
+  };
+  function applyFormat() {
+    var f = FORMATS[state.format] || FORMATS.portrait;
+    W = f.w; H = f.h;
+    canvas.width = W; canvas.height = H;
+  }
+
+  // Blend two hex colors (t=0 -> a, t=1 -> b). Used to derive custom-color shades.
+  function mix(a, b, t) {
+    function parse(h) {
+      h = h.replace('#', '');
+      if (h.length === 3) h = h.split('').map(function (c) { return c + c; }).join('');
+      return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+    }
+    function hex(n) { return ('0' + Math.round(n).toString(16)).slice(-2); }
+    var A = parse(a), B = parse(b);
+    return '#' + hex(A[0] + (B[0] - A[0]) * t) + hex(A[1] + (B[1] - A[1]) * t) + hex(A[2] + (B[2] - A[2]) * t);
+  }
+
+  // The template actually painted: the chosen theme, or a custom-color override
+  // when a Pro user has turned custom colors on.
+  function effectiveTemplate() {
+    var tpl = window.getTemplate(state.templateId);
+    if (state.isPro && state.brand.custom) {
+      var bg = state.brand.bg, title = state.brand.title, accent = state.brand.accent;
+      return {
+        id: 'custom', name: 'Custom', pro: true, font: tpl.font,
+        bg: { type: 'solid', color: bg },
+        titleColor: title,
+        bodyColor: mix(title, bg, 0.3),
+        accentColor: accent,
+        pageColor: mix(title, bg, 0.55),
+        brandColor: title,
+        watermarkColor: mix(title, bg, 0.7),
+      };
+    }
+    return tpl;
+  }
+
+  // ── Persistence ──────────────────────────────────────────────────────────────
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var saved = JSON.parse(raw);
+      if (saved && Array.isArray(saved.slides) && saved.slides.length) {
+        // keep isPro from code default; everything else from storage
+        state.templateId = saved.templateId || state.templateId;
+        state.brandName = saved.brandName || state.brandName;
+        state.brandHandle = saved.brandHandle || state.brandHandle;
+        state.textSize = saved.textSize || state.textSize;
+        state.format = saved.format || state.format;
+        if (saved.brand) {
+          state.brand.custom = !!saved.brand.custom;
+          state.brand.bg = saved.brand.bg || state.brand.bg;
+          state.brand.title = saved.brand.title || state.brand.title;
+          state.brand.accent = saved.brand.accent || state.brand.accent;
+        }
+        state.slides = saved.slides;
+        state.current = Math.min(saved.current || 0, saved.slides.length - 1);
+      }
+    } catch (e) {}
+  }
+
+  // ── Text helpers ─────────────────────────────────────────────────────────────
+  // Wrap text to maxWidth, honoring explicit \n line breaks.
+  function wrapText(text, font, maxWidth) {
+    ctx.font = font;
+    var lines = [];
+    (text || '').split('\n').forEach(function (para) {
+      var words = para.split(' ');
+      var line = '';
+      for (var i = 0; i < words.length; i++) {
+        var test = line ? line + ' ' + words[i] : words[i];
+        if (ctx.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = words[i];
+        } else {
+          line = test;
+        }
+      }
+      lines.push(line);
+    });
+    return lines;
+  }
+
+  // ── The renderer ─────────────────────────────────────────────────────────────
+  function paintSlide(c, slide, idx, total, tpl, showWatermark) {
+    c.save();
+    var pad = 96;
+    var scale = SIZE_SCALE[state.textSize] || 1;
+
+    // background
+    if (tpl.bg.type === 'gradient') {
+      var a = (tpl.bg.angle || 0) * Math.PI / 180;
+      var x = Math.cos(a), y = Math.sin(a);
+      var g = c.createLinearGradient(
+        W / 2 - x * W / 2, H / 2 - y * H / 2,
+        W / 2 + x * W / 2, H / 2 + y * H / 2
+      );
+      g.addColorStop(0, tpl.bg.from);
+      g.addColorStop(1, tpl.bg.to);
+      c.fillStyle = g;
+    } else {
+      c.fillStyle = tpl.bg.color;
+    }
+    c.fillRect(0, 0, W, H);
+
+    // top accent bar (small brand cue, also makes blank slides look intentional)
+    c.fillStyle = tpl.accentColor;
+    c.fillRect(pad, pad, 88, 10);
+
+    // page indicator (top-right)
+    c.fillStyle = tpl.pageColor;
+    c.font = '600 30px ' + tpl.font;
+    c.textAlign = 'right';
+    c.textBaseline = 'top';
+    c.fillText((idx + 1) + ' / ' + total, W - pad, pad - 6);
+
+    // ── body block, vertically centred-ish in the safe area ──
+    c.textAlign = 'left';
+    var maxW = W - pad * 2;
+
+    var titleFont = '800 ' + Math.round(82 * scale) + 'px ' + tpl.font;
+    var titleLines = wrapText(slide.title, titleFont, maxW);
+    var titleLH = Math.round(94 * scale);
+
+    var bodyFont = '400 ' + Math.round(40 * scale) + 'px ' + tpl.font;
+    var bodyLines = slide.body ? wrapText(slide.body, bodyFont, maxW) : [];
+    var bodyLH = Math.round(56 * scale);
+
+    var gap = bodyLines.length ? 44 : 0;
+    var blockH = titleLines.length * titleLH + gap + bodyLines.length * bodyLH;
+    var top = (H - blockH) / 2 - 40;
+    if (top < pad + 80) top = pad + 80;
+
+    // title
+    c.fillStyle = tpl.titleColor;
+    c.font = titleFont;
+    c.textBaseline = 'top';
+    var ty = top;
+    titleLines.forEach(function (ln) { c.fillText(ln, pad, ty); ty += titleLH; });
+
+    // body
+    c.fillStyle = tpl.bodyColor;
+    c.font = bodyFont;
+    var by = ty + gap;
+    bodyLines.forEach(function (ln) { c.fillText(ln, pad, by); by += bodyLH; });
+
+    // ── footer: branding (bottom-left) ──
+    var footY = H - pad - 56;
+    var initial = (state.brandName.trim()[0] || 'S').toUpperCase();
+    var r = 28;
+    c.beginPath();
+    c.arc(pad + r, footY + r, r, 0, Math.PI * 2);
+    c.fillStyle = tpl.accentColor;
+    c.fill();
+    c.fillStyle = tpl.bg.type === 'solid' ? tpl.bg.color : '#0f172a';
+    c.font = '700 30px ' + tpl.font;
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText(initial, pad + r, footY + r + 1);
+
+    c.textAlign = 'left';
+    c.textBaseline = 'top';
+    c.fillStyle = tpl.brandColor;
+    c.font = '700 30px ' + tpl.font;
+    c.fillText(state.brandName, pad + r * 2 + 20, footY + 4);
+    c.fillStyle = tpl.pageColor;
+    c.font = '400 28px ' + tpl.font;
+    c.fillText(state.brandHandle, pad + r * 2 + 20, footY + 36);
+
+    // ── watermark (the growth loop) ──
+    if (showWatermark) {
+      c.textAlign = 'right';
+      c.textBaseline = 'top';
+      c.fillStyle = tpl.watermarkColor;
+      c.font = '600 26px ' + tpl.font;
+      c.fillText('Made with ' + BRAND, W - pad, footY + 20);
+    }
+
+    c.restore();
+  }
+
+  function showWatermark() { return !state.isPro; }
+
+  // ── Preview + thumbnails ─────────────────────────────────────────────────────
+  function renderPreview() {
+    var tpl = effectiveTemplate();
+    var slide = state.slides[state.current];
+    paintSlide(ctx, slide, state.current, state.slides.length, tpl, showWatermark());
+  }
+
+  function renderThumbs() {
+    var strip = $('thumbs');
+    strip.innerHTML = '';
+    var tpl = effectiveTemplate();
+    state.slides.forEach(function (slide, i) {
+      var t = document.createElement('canvas');
+      t.width = W; t.height = H;
+      t.className = 'thumb' + (i === state.current ? ' active' : '');
+      paintSlide(t.getContext('2d'), slide, i, state.slides.length, tpl, showWatermark());
+      var wrap = document.createElement('div');
+      wrap.className = 'thumb-wrap' + (i === state.current ? ' active' : '');
+      var num = document.createElement('span');
+      num.className = 'thumb-num';
+      num.textContent = i + 1;
+      wrap.appendChild(t);
+      wrap.appendChild(num);
+      wrap.onclick = function () { go(i); };
+      strip.appendChild(wrap);
+    });
+  }
+
+  function renderTemplatePicker() {
+    var box = $('templates');
+    box.innerHTML = '';
+    window.TEMPLATES.forEach(function (tpl) {
+      var b = document.createElement('button');
+      b.className = 'tpl-chip' + (tpl.id === state.templateId ? ' active' : '');
+      b.innerHTML = '<span class="tpl-dot" style="background:' +
+        (tpl.bg.type === 'gradient' ? tpl.bg.from : tpl.bg.color) +
+        ';border-color:' + tpl.accentColor + '"></span>' + tpl.name +
+        (tpl.pro ? '<span class="pro-tag">PRO</span>' : '');
+      b.onclick = function () { state.templateId = tpl.id; sync(); };
+      box.appendChild(b);
+    });
+  }
+
+  // ── Sync everything from state ───────────────────────────────────────────────
+  function syncInputs() {
+    $('titleInput').value = state.slides[state.current].title;
+    $('bodyInput').value = state.slides[state.current].body;
+    $('brandName').value = state.brandName;
+    $('brandHandle').value = state.brandHandle;
+    $('slideLabel').textContent = 'Slide ' + (state.current + 1) + ' of ' + state.slides.length;
+    Array.prototype.forEach.call(document.querySelectorAll('.size-btn'), function (b) {
+      b.classList.toggle('active', b.dataset.size === state.textSize);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.fmt-btn'), function (b) {
+      b.classList.toggle('active', b.dataset.fmt === state.format);
+    });
+    $('watermarkNote').style.display = state.isPro ? 'none' : 'flex';
+
+    // custom brand colors (Pro)
+    $('customToggle').checked = state.brand.custom;
+    $('cBg').value = state.brand.bg;
+    $('cText').value = state.brand.title;
+    $('cAccent').value = state.brand.accent;
+    var locked = !state.isPro;
+    $('brandColors').classList.toggle('locked', locked);
+    $('customToggle').disabled = locked;
+    $('cBg').disabled = locked;
+    $('cText').disabled = locked;
+    $('cAccent').disabled = locked;
+  }
+
+  function sync() {
+    renderPreview();
+    renderThumbs();
+    renderTemplatePicker();
+    syncInputs();
+    updateUsageUI();
+    save();
+  }
+
+  function go(i) {
+    state.current = Math.max(0, Math.min(i, state.slides.length - 1));
+    sync();
+  }
+
+  // ── Slide ops ────────────────────────────────────────────────────────────────
+  function addSlide() {
+    state.slides.splice(state.current + 1, 0, { title: 'New slide', body: 'Add your point here.' });
+    go(state.current + 1);
+  }
+  function deleteSlide() {
+    if (state.slides.length <= 1) return;
+    state.slides.splice(state.current, 1);
+    go(Math.min(state.current, state.slides.length - 1));
+  }
+  function moveSlide(dir) {
+    var j = state.current + dir;
+    if (j < 0 || j >= state.slides.length) return;
+    var tmp = state.slides[state.current];
+    state.slides[state.current] = state.slides[j];
+    state.slides[j] = tmp;
+    go(j);
+  }
+
+  // ── Free-plan daily limit ────────────────────────────────────────────────────
+  // NOTE: this is a soft, client-side cap (resettable by clearing the browser).
+  // Real enforcement lands when Stripe + a tiny backend arrive. Good enough to
+  // create upgrade pressure today.
+  function todayStr() { return new Date().toISOString().slice(0, 10); }
+  function getUsage() {
+    try {
+      var u = JSON.parse(localStorage.getItem(USAGE_KEY) || '{}');
+      if (u.date !== todayStr()) return { date: todayStr(), count: 0 };
+      return { date: u.date, count: u.count || 0 };
+    } catch (e) { return { date: todayStr(), count: 0 }; }
+  }
+  function exportsLeft() { return Math.max(0, FREE_DAILY_EXPORTS - getUsage().count); }
+  function consumeExport() {
+    if (state.isPro) return;
+    var u = getUsage(); u.count += 1;
+    try { localStorage.setItem(USAGE_KEY, JSON.stringify(u)); } catch (e) {}
+    updateUsageUI();
+  }
+  function updateUsageUI() {
+    var note = $('usageNote');
+    if (!note) return;
+    if (state.isPro) {
+      note.textContent = '✦ Pro — unlimited downloads';
+      note.className = 'usage pro';
+      return;
+    }
+    var left = exportsLeft();
+    note.className = 'usage' + (left === 0 ? ' empty' : '');
+    note.textContent = left + ' of ' + FREE_DAILY_EXPORTS + ' free carousels left today';
+  }
+
+  // ── Upsell modal ─────────────────────────────────────────────────────────────
+  function openUpsell(context) {
+    var reason = $('upsellReason');
+    if (context === 'limit') {
+      reason.textContent = "You've used today's free carousels. Go Pro for unlimited downloads — no waiting until tomorrow.";
+    } else if (context === 'theme') {
+      reason.textContent = 'That’s a premium theme. Pro unlocks all 12 premium themes and removes the watermark.';
+    } else if (context === 'brand') {
+      reason.textContent = 'Custom brand colors are a Pro feature — paint your slides in your exact colors.';
+    } else if (context === 'size') {
+      reason.textContent = 'Square (1:1) export is a Pro size. Go Pro to post perfectly-sized graphics anywhere.';
+    } else {
+      reason.textContent = 'Unlock the full thing for the price of a coffee.';
+    }
+    $('upsellNote').textContent = '';
+    $('upsell').classList.add('show');
+  }
+  function closeUpsell() { $('upsell').classList.remove('show'); }
+  function setPro(on) {
+    state.isPro = on;
+    try {
+      if (on) localStorage.setItem(PRO_KEY, '1');
+      else localStorage.removeItem(PRO_KEY);
+    } catch (e) {}
+    updateUsageUI();
+    sync();
+  }
+
+  // ── Export ───────────────────────────────────────────────────────────────────
+  function slideToBlob(i) {
+    return new Promise(function (resolve) {
+      var off = document.createElement('canvas');
+      off.width = W; off.height = H;
+      paintSlide(off.getContext('2d'), state.slides[i], i, state.slides.length,
+        effectiveTemplate(), showWatermark());
+      off.toBlob(function (b) { resolve(b); }, 'image/png');
+    });
+  }
+  function downloadBlob(blob, name) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  // Returns true if export is allowed; otherwise opens the right upsell and returns false.
+  function canExport() {
+    if (state.isPro) return true;
+    if (window.getTemplate(state.templateId).pro) { openUpsell('theme'); return false; }
+    if (exportsLeft() <= 0) { openUpsell('limit'); return false; }
+    return true;
+  }
+  function exportCurrent() {
+    if (!canExport()) return;
+    slideToBlob(state.current).then(function (b) {
+      downloadBlob(b, 'swipely-slide-' + (state.current + 1) + '.png');
+      consumeExport();
+    });
+  }
+  function exportAll() {
+    if (!canExport()) return;
+    var btn = $('exportAll');
+    btn.disabled = true; btn.textContent = 'Exporting…';
+    var i = 0;
+    (function next() {
+      if (i >= state.slides.length) {
+        btn.disabled = false; btn.textContent = 'Download all slides';
+        consumeExport();   // one carousel = one use, regardless of slide count
+        return;
+      }
+      slideToBlob(i).then(function (b) {
+        downloadBlob(b, 'swipely-slide-' + (i + 1) + '.png');
+        i++;
+        setTimeout(next, 400); // small gap so browsers don't block the batch
+      });
+    })();
+  }
+
+  // ── Wire up ──────────────────────────────────────────────────────────────────
+  function bind() {
+    $('titleInput').addEventListener('input', function (e) {
+      state.slides[state.current].title = e.target.value; renderPreview(); renderThumbs(); save();
+    });
+    $('bodyInput').addEventListener('input', function (e) {
+      state.slides[state.current].body = e.target.value; renderPreview(); renderThumbs(); save();
+    });
+    $('brandName').addEventListener('input', function (e) {
+      state.brandName = e.target.value; renderPreview(); renderThumbs(); save();
+    });
+    $('brandHandle').addEventListener('input', function (e) {
+      state.brandHandle = e.target.value; renderPreview(); renderThumbs(); save();
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.size-btn'), function (b) {
+      b.addEventListener('click', function () { state.textSize = b.dataset.size; sync(); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.fmt-btn'), function (b) {
+      b.addEventListener('click', function () {
+        var f = b.dataset.fmt;
+        if (FORMATS[f].pro && !state.isPro) { openUpsell('size'); return; }
+        state.format = f; applyFormat(); sync();
+      });
+    });
+    // Custom brand colors (Pro). For free users, any interaction opens the upsell.
+    $('brandColors').addEventListener('click', function (e) {
+      if (!state.isPro) { e.preventDefault(); openUpsell('brand'); }
+    }, true);
+    $('customToggle').addEventListener('change', function (e) {
+      state.brand.custom = e.target.checked; sync();
+    });
+    function bindColor(id, key) {
+      $(id).addEventListener('input', function (e) {
+        state.brand[key] = e.target.value;
+        if (state.brand.custom) { renderPreview(); renderThumbs(); }
+        save();
+      });
+    }
+    bindColor('cBg', 'bg');
+    bindColor('cText', 'title');
+    bindColor('cAccent', 'accent');
+    $('addSlide').addEventListener('click', addSlide);
+    $('delSlide').addEventListener('click', deleteSlide);
+    $('moveLeft').addEventListener('click', function () { moveSlide(-1); });
+    $('moveRight').addEventListener('click', function () { moveSlide(1); });
+    $('prevSlide').addEventListener('click', function () { go(state.current - 1); });
+    $('nextSlide').addEventListener('click', function () { go(state.current + 1); });
+    $('exportCurrent').addEventListener('click', exportCurrent);
+    $('exportAll').addEventListener('click', exportAll);
+    $('proBtn').addEventListener('click', function () { openUpsell(); });
+    $('upsellClose').addEventListener('click', closeUpsell);
+    $('upsell').addEventListener('click', function (e) {
+      if (e.target === $('upsell')) closeUpsell(); // click the dimmed backdrop to close
+    });
+    $('upsellGetPro').addEventListener('click', function () {
+      if (PRO_CHECKOUT_URL) {
+        // Live checkout: hand off to Stripe. On success Stripe redirects back to
+        // app.html?pro=success, which unlocks Pro on boot (see below).
+        window.location.href = PRO_CHECKOUT_URL;
+        return;
+      }
+      $('upsellNote').textContent = 'Checkout link isn’t connected yet (one 5-min Stripe step). Use “Preview Pro” below to try the Pro features now.';
+    });
+    $('upsellPreview').addEventListener('click', function () {
+      setPro(true);
+      closeUpsell();
+    });
+    $('resetBtn').addEventListener('click', function () {
+      if (confirm('Start a fresh carousel? This clears your current slides.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    });
+  }
+
+  // ── Boot ─────────────────────────────────────────────────────────────────────
+  load();
+
+  // Returning from a successful Stripe checkout? Unlock Pro and clean the URL so
+  // a refresh/bookmark doesn't re-trigger or leak the param.
+  if (/[?&]pro=success/.test(location.search)) {
+    setPro(true);
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+  } else if (localStorage.getItem(PRO_KEY) === '1') {
+    state.isPro = true; // restore a previously unlocked Pro session
+  }
+
+  // Don't let a free user inherit Pro-only settings from a past Pro-preview session.
+  if (!state.isPro) {
+    if ((FORMATS[state.format] || {}).pro) state.format = 'portrait';
+    state.brand.custom = false;
+  }
+  applyFormat();
+  bind();
+  sync();
+})();

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor · Swipely</title>
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo">Swipe<span>ly</span></div>
+    <a class="btn ghost" href="index.html">← Home</a>
+    <div class="spacer"></div>
+    <button class="btn ghost" id="resetBtn">New carousel</button>
+    <button class="btn pro" id="proBtn">✦ Go Pro</button>
+  </div>
+
+  <div class="app">
+    <!-- slide rail -->
+    <aside class="rail">
+      <h4>Slides</h4>
+      <div id="thumbs"></div>
+      <button class="btn add" id="addSlide">+ Add</button>
+    </aside>
+
+    <!-- stage -->
+    <main class="stage">
+      <canvas id="canvas"></canvas>
+      <div class="nav">
+        <button class="btn" id="prevSlide">‹</button>
+        <span class="label" id="slideLabel">Slide 1 of 1</span>
+        <button class="btn" id="nextSlide">›</button>
+      </div>
+      <div class="export-row">
+        <button class="btn" id="exportCurrent">Download this slide</button>
+        <button class="btn primary" id="exportAll">Download all slides</button>
+      </div>
+      <div class="usage" id="usageNote"></div>
+    </main>
+
+    <!-- controls -->
+    <section class="panel">
+      <div class="field">
+        <label for="titleInput">Title</label>
+        <textarea id="titleInput" rows="2"></textarea>
+        <div class="hint">Press Enter for a manual line break.</div>
+      </div>
+      <div class="field">
+        <label for="bodyInput">Body</label>
+        <textarea id="bodyInput" rows="4"></textarea>
+      </div>
+
+      <div class="section-title">Slide</div>
+      <div class="tools">
+        <button class="btn" id="moveLeft">◀ Move</button>
+        <button class="btn" id="moveRight">Move ▶</button>
+        <button class="btn" id="delSlide">🗑 Delete</button>
+      </div>
+
+      <div class="section-title">Theme</div>
+      <div class="templates" id="templates"></div>
+
+      <div class="section-title">Size</div>
+      <div class="size-row">
+        <button class="size-btn fmt-btn" data-fmt="portrait">Portrait 4:5</button>
+        <button class="size-btn fmt-btn" data-fmt="square">Square 1:1<span class="pro-tag">PRO</span></button>
+      </div>
+
+      <div class="section-title">Text size</div>
+      <div class="size-row">
+        <button class="size-btn" data-size="S">S</button>
+        <button class="size-btn" data-size="M">M</button>
+        <button class="size-btn" data-size="L">L</button>
+      </div>
+
+      <div class="section-title">Brand colors <span class="pro-pill">PRO</span></div>
+      <div class="brand-colors" id="brandColors">
+        <label class="brand-toggle"><input type="checkbox" id="customToggle" /> Use custom colors</label>
+        <div class="color-row">
+          <div class="color-field"><span>Background</span><input type="color" id="cBg" /></div>
+          <div class="color-field"><span>Text</span><input type="color" id="cText" /></div>
+          <div class="color-field"><span>Accent</span><input type="color" id="cAccent" /></div>
+        </div>
+      </div>
+
+      <div class="section-title">Your brand</div>
+      <div class="field">
+        <label for="brandName">Name</label>
+        <input id="brandName" type="text" />
+      </div>
+      <div class="field">
+        <label for="brandHandle">Handle</label>
+        <input id="brandHandle" type="text" />
+      </div>
+
+      <div class="wm-note" id="watermarkNote">
+        <span>✦</span>
+        <div>Free plan: <b>2 carousels/day</b>, with a small <b>“Made with Swipely”</b> mark. Pro ($8/mo) removes the mark, unlocks premium themes, and goes unlimited.</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Upsell modal -->
+  <div class="modal-overlay" id="upsell">
+    <div class="modal">
+      <button class="modal-x" id="upsellClose" aria-label="Close">×</button>
+      <div class="modal-badge">✦ Swipely Pro</div>
+      <div class="modal-price">$8<span>/month</span></div>
+      <p class="modal-reason" id="upsellReason"></p>
+      <ul class="modal-list">
+        <li>Unlimited carousels &amp; downloads</li>
+        <li>No “Made with Swipely” watermark</li>
+        <li>12 premium themes</li>
+        <li>Custom brand colors</li>
+        <li>Square (1:1) export size</li>
+        <li>Priority access to new features</li>
+      </ul>
+      <button class="btn primary modal-cta" id="upsellGetPro">Get Pro — $8/mo</button>
+      <div class="modal-note" id="upsellNote"></div>
+      <button class="modal-preview" id="upsellPreview">Preview Pro features →</button>
+    </div>
+  </div>
+
+  <script src="templates.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
