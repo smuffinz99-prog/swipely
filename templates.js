@@ -1,8 +1,8 @@
 /* Swipely — theme definitions.
  * bg: { type:'solid', color } | { type:'gradient', from, to, angle }
- * overlay (optional): 'damask' | 'baroque' | 'art-deco' | 'cathedral' | 'manuscript'
- *   Pattern overlays are drawn on the canvas after the background fill using the
- *   theme's titleColor at low opacity — dark themes get light patterns, light get dark.
+ * overlay (optional): drawn on canvas after bg fill using titleColor at opacity.
+ *   'damask' | 'baroque' | 'art-deco' | 'cathedral' | 'manuscript'
+ *   'stained-arch' | 'lattice' | 'wave-lines'
  */
 window.TEMPLATES = [
   // ── Free ─────────────────────────────────────────────────────────────────────
@@ -43,7 +43,7 @@ window.TEMPLATES = [
     pageColor: '#6ee7b7', brandColor: '#064e3b', watermarkColor: '#a7f3d0',
   },
 
-  // ── Pro: gradients ────────────────────────────────────────────────────────────
+  // ── Pro: Cute & Pastel ────────────────────────────────────────────────────────
   {
     id: 'sunset',
     name: 'Sunset',
@@ -53,6 +53,89 @@ window.TEMPLATES = [
     titleColor: '#ffffff', bodyColor: '#ffe4e6', accentColor: '#fde68a',
     pageColor: '#fbcfe8', brandColor: '#ffffff', watermarkColor: '#fbcfe8',
   },
+  {
+    id: 'berry',
+    name: 'Berry',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#ec4899', to: '#7c3aed', angle: 135 },
+    titleColor: '#ffffff', bodyColor: '#fbcfe8', accentColor: '#f9a8d4',
+    pageColor: '#f472b6', brandColor: '#ffffff', watermarkColor: '#9d174d',
+  },
+  {
+    id: 'pastel-dreams',
+    name: 'Pastel Dreams',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#ffc0db', to: '#c0dbff', angle: 45 },
+    titleColor: '#6b4c9a', bodyColor: '#8b7ab8', accentColor: '#e8a4d2',
+    pageColor: '#b8a8d9', brandColor: '#6b4c9a', watermarkColor: '#e0d4f7',
+  },
+  {
+    id: 'cotton-candy',
+    name: 'Cotton Candy',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#ffb3d9', to: '#b3d9ff', angle: 90 },
+    titleColor: '#d946a6', bodyColor: '#ec4899', accentColor: '#f472b6',
+    pageColor: '#fda4af', brandColor: '#d946a6', watermarkColor: '#fce7f3',
+  },
+  {
+    id: 'dreamy',
+    name: 'Dreamy',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#d4b3f5', to: '#a8edea', angle: 135 },
+    titleColor: '#4a1d96', bodyColor: '#6d28d9', accentColor: '#a78bfa',
+    pageColor: '#7c3aed', brandColor: '#4a1d96', watermarkColor: '#ddd6fe',
+  },
+  {
+    id: 'candy',
+    name: 'Candy',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#ff6b9d', to: '#ffd93d', angle: 135 },
+    titleColor: '#ffffff', bodyColor: '#fff0f6', accentColor: '#ffe066',
+    pageColor: '#ffc1d6', brandColor: '#ffffff', watermarkColor: '#ffb3c6',
+  },
+  {
+    id: 'blush',
+    name: 'Blush',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#ffb3c6', to: '#ffd1a9', angle: 135 },
+    titleColor: '#7c1d4a', bodyColor: '#9d2060', accentColor: '#e8447a',
+    pageColor: '#f472b6', brandColor: '#7c1d4a', watermarkColor: '#fde7f0',
+  },
+  {
+    id: 'aurora',
+    name: 'Aurora',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#00c9a7', to: '#845ec2', angle: 135 },
+    titleColor: '#ffffff', bodyColor: '#e0f7f2', accentColor: '#a8f0e0',
+    pageColor: '#c4b5fd', brandColor: '#ffffff', watermarkColor: '#4c1d95',
+  },
+  {
+    id: 'violet',
+    name: 'Violet',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#a78bfa', to: '#fbcfe8', angle: 45 },
+    titleColor: '#3b0764', bodyColor: '#581c87', accentColor: '#7c3aed',
+    pageColor: '#a855f7', brandColor: '#3b0764', watermarkColor: '#ede9fe',
+  },
+  {
+    id: 'citrus',
+    name: 'Citrus',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#ffd93d', to: '#ff6348', angle: 135 },
+    titleColor: '#431407', bodyColor: '#7c2d12', accentColor: '#ffffff',
+    pageColor: '#c2410c', brandColor: '#431407', watermarkColor: '#fed7aa',
+  },
+
+  // ── Pro: Bold ─────────────────────────────────────────────────────────────────
   {
     id: 'ocean',
     name: 'Ocean',
@@ -72,15 +155,6 @@ window.TEMPLATES = [
     pageColor: '#d97706', brandColor: '#fef3c7', watermarkColor: '#1f2937',
   },
   {
-    id: 'rose-gold',
-    name: 'Rose Gold',
-    pro: true,
-    font: "Georgia, 'Times New Roman', serif",
-    bg: { type: 'gradient', from: '#f4d1c8', to: '#d4a5a0', angle: 135 },
-    titleColor: '#6d4c4a', bodyColor: '#8b6b69', accentColor: '#d4a199',
-    pageColor: '#d9a09f', brandColor: '#6d4c4a', watermarkColor: '#f0e5e0',
-  },
-  {
     id: 'cyberpunk',
     name: 'Cyberpunk',
     pro: true,
@@ -88,24 +162,6 @@ window.TEMPLATES = [
     bg: { type: 'gradient', from: '#0d0221', to: '#1d0043', angle: 135 },
     titleColor: '#ff006e', bodyColor: '#00f5ff', accentColor: '#ffbe0b',
     pageColor: '#8338ec', brandColor: '#ff006e', watermarkColor: '#3a0e4d',
-  },
-  {
-    id: 'neon-night',
-    name: 'Neon Night',
-    pro: true,
-    font: "'Segoe UI', system-ui, sans-serif",
-    bg: { type: 'solid', color: '#0a0e27' },
-    titleColor: '#00ff00', bodyColor: '#00ffff', accentColor: '#ff00ff',
-    pageColor: '#ff0080', brandColor: '#00ff00', watermarkColor: '#1a0a3f',
-  },
-  {
-    id: 'marble',
-    name: 'Marble',
-    pro: true,
-    font: "Georgia, 'Times New Roman', serif",
-    bg: { type: 'gradient', from: '#e8e4e0', to: '#ccc7c3', angle: 45 },
-    titleColor: '#2d2622', bodyColor: '#5a4d47', accentColor: '#8b8680',
-    pageColor: '#a39c95', brandColor: '#2d2622', watermarkColor: '#d4ccc5',
   },
   {
     id: 'autumn',
@@ -117,15 +173,15 @@ window.TEMPLATES = [
     pageColor: '#d97706', brandColor: '#fffbeb', watermarkColor: '#78350f',
   },
 
-  // ── Pro: pattern designs ──────────────────────────────────────────────────────
+  // ── Pro: Pattern Designs ──────────────────────────────────────────────────────
   {
     id: 'gothic-damask',
     name: 'Gothic Damask',
     pro: true,
     font: "Georgia, 'Times New Roman', serif",
     bg: { type: 'solid', color: '#0a0006' },
-    titleColor: '#f5e6c8', bodyColor: '#c9a96e', accentColor: '#c9a96e',
-    pageColor: '#6b3d1e', brandColor: '#f5e6c8', watermarkColor: '#3d1f0a',
+    titleColor: '#f0e0c0', bodyColor: '#c9a028', accentColor: '#c9a028',
+    pageColor: '#6b3d1e', brandColor: '#f0e0c0', watermarkColor: '#3d1f0a',
     overlay: 'damask',
   },
   {
@@ -133,9 +189,9 @@ window.TEMPLATES = [
     name: 'Baroque',
     pro: true,
     font: "Georgia, 'Times New Roman', serif",
-    bg: { type: 'gradient', from: '#0c0c1a', to: '#1a0c0c', angle: 135 },
-    titleColor: '#f0d080', bodyColor: '#d4aa60', accentColor: '#f0d080',
-    pageColor: '#8a6020', brandColor: '#f0d080', watermarkColor: '#2a1a04',
+    bg: { type: 'gradient', from: '#0c0c18', to: '#18080c', angle: 135 },
+    titleColor: '#e8c860', bodyColor: '#c8a840', accentColor: '#e8c860',
+    pageColor: '#8a6020', brandColor: '#e8c860', watermarkColor: '#2a1a04',
     overlay: 'baroque',
   },
   {
@@ -143,9 +199,9 @@ window.TEMPLATES = [
     name: 'Art Deco',
     pro: true,
     font: "Georgia, serif",
-    bg: { type: 'solid', color: '#0a1a18' },
-    titleColor: '#d4c88a', bodyColor: '#a89a60', accentColor: '#d4c88a',
-    pageColor: '#4a6040', brandColor: '#d4c88a', watermarkColor: '#0f2a24',
+    bg: { type: 'solid', color: '#080e18' },
+    titleColor: '#c8b870', bodyColor: '#a89850', accentColor: '#c8b870',
+    pageColor: '#4a5030', brandColor: '#c8b870', watermarkColor: '#1a1a08',
     overlay: 'art-deco',
   },
   {
@@ -153,9 +209,9 @@ window.TEMPLATES = [
     name: 'Cathedral',
     pro: true,
     font: "Georgia, 'Times New Roman', serif",
-    bg: { type: 'gradient', from: '#0e0020', to: '#1a0035', angle: 180 },
-    titleColor: '#e8d5f5', bodyColor: '#c4a0e0', accentColor: '#9b59b6',
-    pageColor: '#6b2fa0', brandColor: '#e8d5f5', watermarkColor: '#2a0050',
+    bg: { type: 'gradient', from: '#060018', to: '#120028', angle: 180 },
+    titleColor: '#d8c8f0', bodyColor: '#b090d8', accentColor: '#8860c0',
+    pageColor: '#6b2fa0', brandColor: '#d8c8f0', watermarkColor: '#2a0050',
     overlay: 'cathedral',
   },
   {
@@ -163,10 +219,40 @@ window.TEMPLATES = [
     name: 'Manuscript',
     pro: true,
     font: "Georgia, 'Times New Roman', serif",
-    bg: { type: 'solid', color: '#f2e8d5' },
-    titleColor: '#2c1810', bodyColor: '#4a2c1a', accentColor: '#6b3a1f',
-    pageColor: '#8b5a2b', brandColor: '#2c1810', watermarkColor: '#c8a878',
+    bg: { type: 'solid', color: '#f0e8d8' },
+    titleColor: '#281808', bodyColor: '#4a2c1a', accentColor: '#6b3a20',
+    pageColor: '#8b5a2b', brandColor: '#281808', watermarkColor: '#c8a878',
     overlay: 'manuscript',
+  },
+  {
+    id: 'stained-arch',
+    name: 'Stained Arch',
+    pro: true,
+    font: "Georgia, 'Times New Roman', serif",
+    bg: { type: 'gradient', from: '#040818', to: '#0c0825', angle: 180 },
+    titleColor: '#d8d0f0', bodyColor: '#b0a8d8', accentColor: '#8070c0',
+    pageColor: '#6050a0', brandColor: '#d8d0f0', watermarkColor: '#1a1040',
+    overlay: 'stained-arch',
+  },
+  {
+    id: 'lattice',
+    name: 'Lattice',
+    pro: true,
+    font: "Georgia, serif",
+    bg: { type: 'solid', color: '#050304' },
+    titleColor: '#d4b040', bodyColor: '#a88828', accentColor: '#d4b040',
+    pageColor: '#604810', brandColor: '#d4b040', watermarkColor: '#1a1008',
+    overlay: 'lattice',
+  },
+  {
+    id: 'wave-lines',
+    name: 'Wave Lines',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#020c18', to: '#061028', angle: 180 },
+    titleColor: '#70d8f0', bodyColor: '#50b8d0', accentColor: '#40b0d0',
+    pageColor: '#208090', brandColor: '#70d8f0', watermarkColor: '#041828',
+    overlay: 'wave-lines',
   },
 ];
 
