@@ -140,6 +140,190 @@
     return lines;
   }
 
+  // ── Pattern overlays ─────────────────────────────────────────────────────────
+  function drawPatternOverlay(c, tpl) {
+    c.save();
+    var col = tpl.titleColor || '#ffffff';
+    if (tpl.overlay === 'damask')     { overlayDamask(c, col); }
+    if (tpl.overlay === 'baroque')    { overlayBaroque(c, col); }
+    if (tpl.overlay === 'art-deco')   { overlayArtDeco(c, col); }
+    if (tpl.overlay === 'cathedral')  { overlayCathedral(c, col); }
+    if (tpl.overlay === 'manuscript') { overlayManuscript(c, col); }
+    c.restore();
+  }
+
+  function overlayDamask(c, col) {
+    c.strokeStyle = col; c.fillStyle = col; c.lineWidth = 2; c.globalAlpha = 0.11;
+    var s = 140;
+    for (var row = -1; row <= Math.ceil(H / s) + 1; row++) {
+      for (var col2 = -1; col2 <= Math.ceil(W / s) + 1; col2++) {
+        var ox = (Math.abs(row) % 2 === 1) ? s / 2 : 0;
+        damaskTile(c, col2 * s + ox, row * s, s);
+      }
+    }
+  }
+  function damaskTile(c, cx, cy, s) {
+    var r = s * 0.3;
+    c.beginPath();
+    c.moveTo(cx, cy - r);
+    c.quadraticCurveTo(cx + r * 0.65, cy - r * 0.65, cx + r * 0.72, cy);
+    c.quadraticCurveTo(cx + r * 0.65, cy + r * 0.65, cx, cy + r);
+    c.quadraticCurveTo(cx - r * 0.65, cy + r * 0.65, cx - r * 0.72, cy);
+    c.quadraticCurveTo(cx - r * 0.65, cy - r * 0.65, cx, cy - r);
+    c.closePath(); c.stroke();
+    [0, Math.PI / 2, Math.PI, Math.PI * 1.5].forEach(function (a) {
+      c.beginPath();
+      c.ellipse(cx + Math.cos(a) * r * 1.3, cy + Math.sin(a) * r * 1.3, r * 0.3, r * 0.13, a, 0, Math.PI * 2);
+      c.stroke();
+    });
+    c.beginPath(); c.arc(cx, cy, r * 0.11, 0, Math.PI * 2); c.fill();
+    [Math.PI / 4, Math.PI * 3 / 4, Math.PI * 5 / 4, Math.PI * 7 / 4].forEach(function (a) {
+      c.beginPath(); c.arc(cx + Math.cos(a) * r * 0.85, cy + Math.sin(a) * r * 0.85, 3.5, 0, Math.PI * 2); c.fill();
+    });
+  }
+
+  function overlayBaroque(c, col) {
+    c.strokeStyle = col; c.fillStyle = col;
+    var m = 65;
+    c.globalAlpha = 0.30; c.lineWidth = 3;
+    c.strokeRect(m, m, W - m * 2, H - m * 2);
+    c.globalAlpha = 0.15; c.lineWidth = 1.5;
+    c.strokeRect(m + 18, m + 18, W - m * 2 - 36, H - m * 2 - 36);
+    c.globalAlpha = 0.35; c.lineWidth = 2.5;
+    [[m, m, 0], [W - m, m, Math.PI / 2], [W - m, H - m, Math.PI], [m, H - m, Math.PI * 3 / 2]].forEach(function (pt) {
+      c.save(); c.translate(pt[0], pt[1]); c.rotate(pt[2]); baroqueCorner(c, 110); c.restore();
+    });
+    c.globalAlpha = 0.20;
+    var sp = 80, n = Math.ceil((W - m * 2) / sp);
+    for (var i = 1; i < n; i++) {
+      var bx = m + i * (W - m * 2) / n;
+      c.beginPath(); c.arc(bx, m, 5, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.arc(bx, H - m, 5, 0, Math.PI * 2); c.fill();
+    }
+    var ns = Math.ceil((H - m * 2) / sp);
+    for (var j = 1; j < ns; j++) {
+      var by = m + j * (H - m * 2) / ns;
+      c.beginPath(); c.arc(m, by, 5, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.arc(W - m, by, 5, 0, Math.PI * 2); c.fill();
+    }
+  }
+  function baroqueCorner(c, sz) {
+    c.beginPath();
+    c.moveTo(20, 0);
+    c.bezierCurveTo(sz * 0.4, -15, sz * 0.7, -10, sz * 0.9, 5);
+    c.bezierCurveTo(sz * 1.05, 18, sz * 0.85, 35, sz * 0.65, 25);
+    c.bezierCurveTo(sz * 0.45, 15, sz * 0.55, -5, sz * 0.75, -8);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(0, 20);
+    c.bezierCurveTo(-15, sz * 0.4, -10, sz * 0.7, 5, sz * 0.9);
+    c.bezierCurveTo(18, sz * 1.05, 35, sz * 0.85, 25, sz * 0.65);
+    c.bezierCurveTo(15, sz * 0.45, -5, sz * 0.55, -8, sz * 0.75);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(25, 25);
+    c.bezierCurveTo(sz * 0.35, sz * 0.2, sz * 0.55, sz * 0.35, sz * 0.45, sz * 0.55);
+    c.bezierCurveTo(sz * 0.35, sz * 0.75, sz * 0.2, sz * 0.65, sz * 0.3, sz * 0.45);
+    c.stroke();
+    [[8, 0], [16, 0], [24, 0], [0, 8], [0, 16], [0, 24]].forEach(function (d) {
+      c.beginPath(); c.arc(d[0], d[1], 3, 0, Math.PI * 2); c.fill();
+    });
+  }
+
+  function overlayArtDeco(c, col) {
+    c.strokeStyle = col; c.fillStyle = col;
+    var fx = W / 2, fy = H + 80;
+    c.globalAlpha = 0.12; c.lineWidth = 1.5;
+    for (var i = 0; i < 36; i++) {
+      var a = -Math.PI + (Math.PI * i / 35);
+      c.beginPath(); c.moveTo(fx, fy); c.lineTo(fx + Math.cos(a) * H * 1.4, fy + Math.sin(a) * H * 1.4); c.stroke();
+    }
+    c.globalAlpha = 0.09;
+    [250, 500, 750, 1000, 1250].forEach(function (r) {
+      c.beginPath(); c.arc(fx, fy, r, -Math.PI, 0); c.stroke();
+    });
+    var m = 75;
+    c.globalAlpha = 0.28; c.lineWidth = 3; c.strokeRect(m, m, W - m * 2, H - m * 2);
+    c.globalAlpha = 0.14; c.lineWidth = 1.5; c.strokeRect(m + 20, m + 20, W - m * 2 - 40, H - m * 2 - 40);
+    c.globalAlpha = 0.32; c.lineWidth = 2.5;
+    [[m, m, 1, 1], [W - m, m, -1, 1], [W - m, H - m, -1, -1], [m, H - m, 1, -1]].forEach(function (pt) {
+      var x = pt[0], y = pt[1], sx = pt[2], sy = pt[3], sz = 65;
+      c.beginPath(); c.moveTo(x + sx * sz, y); c.lineTo(x, y); c.lineTo(x, y + sy * sz); c.stroke();
+      c.beginPath(); c.moveTo(x + sx * sz * 0.55, y + sy * 18); c.lineTo(x + sx * 18, y + sy * 18); c.lineTo(x + sx * 18, y + sy * sz * 0.55); c.stroke();
+      c.beginPath(); c.moveTo(x + sx * 35, y); c.lineTo(x + sx * 50, y + sy * 15); c.lineTo(x + sx * 35, y + sy * 30); c.lineTo(x + sx * 20, y + sy * 15); c.closePath(); c.stroke();
+    });
+  }
+
+  function overlayCathedral(c, col) {
+    c.fillStyle = col; c.strokeStyle = col;
+    var archW = 180, archH = 380;
+    c.globalAlpha = 0.13;
+    for (var i = -1; i < Math.ceil(W / archW) + 2; i++) {
+      gothicArch(c, i * archW + archW / 2, H, archW * 0.88, archH, true);
+    }
+    c.globalAlpha = 0.07;
+    for (var j = -1; j < Math.ceil(W / 90) + 2; j++) {
+      gothicArch(c, j * 90 + 45, H - archH + 190, 79, 190, false);
+    }
+    var m = 70;
+    c.globalAlpha = 0.22; c.lineWidth = 3; c.strokeRect(m, m, W - m * 2, H - m * 2);
+    c.globalAlpha = 0.11; c.lineWidth = 1.5; c.strokeRect(m + 16, m + 16, W - m * 2 - 32, H - m * 2 - 32);
+    var rcx = W / 2, rcy = 270, rr = 115;
+    c.globalAlpha = 0.16; c.lineWidth = 2;
+    c.beginPath(); c.arc(rcx, rcy, rr, 0, Math.PI * 2); c.stroke();
+    c.beginPath(); c.arc(rcx, rcy, rr * 0.64, 0, Math.PI * 2); c.stroke();
+    c.beginPath(); c.arc(rcx, rcy, rr * 0.24, 0, Math.PI * 2); c.stroke();
+    for (var k = 0; k < 8; k++) {
+      var sa = k * Math.PI / 4;
+      c.beginPath();
+      c.moveTo(rcx + Math.cos(sa) * rr * 0.24, rcy + Math.sin(sa) * rr * 0.24);
+      c.lineTo(rcx + Math.cos(sa) * rr * 0.64, rcy + Math.sin(sa) * rr * 0.64);
+      c.stroke();
+      c.beginPath(); c.arc(rcx + Math.cos(sa) * rr * 0.84, rcy + Math.sin(sa) * rr * 0.84, rr * 0.17, 0, Math.PI * 2); c.stroke();
+    }
+  }
+  function gothicArch(c, cx, base, w, h, fill) {
+    var hw = w / 2;
+    c.beginPath();
+    c.moveTo(cx - hw, base); c.lineTo(cx - hw, base - h * 0.4);
+    c.bezierCurveTo(cx - hw, base - h * 0.85, cx - hw * 0.08, base - h, cx, base - h);
+    c.bezierCurveTo(cx + hw * 0.08, base - h, cx + hw, base - h * 0.85, cx + hw, base - h * 0.4);
+    c.lineTo(cx + hw, base); c.closePath();
+    if (fill) c.fill(); else c.stroke();
+  }
+
+  function overlayManuscript(c, col) {
+    c.strokeStyle = col; c.fillStyle = col;
+    var m = 55;
+    c.globalAlpha = 0.40; c.lineWidth = 3.5; c.strokeRect(m, m, W - m * 2, H - m * 2);
+    c.globalAlpha = 0.18; c.lineWidth = 1; c.strokeRect(m + 15, m + 15, W - m * 2 - 30, H - m * 2 - 30);
+    c.globalAlpha = 0.10; c.strokeRect(m + 28, m + 28, W - m * 2 - 56, H - m * 2 - 56);
+    c.globalAlpha = 0.35; c.lineWidth = 2;
+    [[m, m, 0], [W - m, m, Math.PI / 2], [W - m, H - m, Math.PI], [m, H - m, Math.PI * 3 / 2]].forEach(function (pt) {
+      c.save(); c.translate(pt[0], pt[1]); c.rotate(pt[2]); manuscriptCorner(c, 80); c.restore();
+    });
+    c.globalAlpha = 0.30;
+    [[W / 2, m], [W / 2, H - m], [m, H / 2], [W - m, H / 2]].forEach(function (pt) {
+      c.save(); c.translate(pt[0], pt[1]); manuscriptDiamond(c, 13); c.restore();
+    });
+  }
+  function manuscriptCorner(c, sz) {
+    c.beginPath(); c.moveTo(sz, 0); c.lineTo(0, 0); c.lineTo(0, sz); c.stroke();
+    c.beginPath();
+    c.moveTo(sz * 0.5, 0); c.lineTo(sz * 0.5, sz * 0.18);
+    c.lineTo(sz * 0.18, sz * 0.18); c.lineTo(sz * 0.18, sz * 0.5); c.lineTo(0, sz * 0.5);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(0, sz * 0.08); c.lineTo(sz * 0.08, 0); c.lineTo(sz * 0.16, sz * 0.08); c.lineTo(sz * 0.08, sz * 0.16); c.closePath(); c.stroke();
+    [sz * 0.35, sz * 0.6, sz * 0.82].forEach(function (d) {
+      c.beginPath(); c.arc(d, -1, 3.5, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.arc(-1, d, 3.5, 0, Math.PI * 2); c.fill();
+    });
+  }
+  function manuscriptDiamond(c, r) {
+    c.beginPath(); c.moveTo(0, -r); c.lineTo(r * 0.7, 0); c.lineTo(0, r); c.lineTo(-r * 0.7, 0); c.closePath(); c.fill();
+  }
+
   // ── The renderer ─────────────────────────────────────────────────────────────
   function paintSlide(c, slide, idx, total, tpl, showWatermark) {
     c.save();
@@ -161,6 +345,9 @@
       c.fillStyle = tpl.bg.color;
     }
     c.fillRect(0, 0, W, H);
+
+    // pattern overlay
+    if (tpl.overlay) { drawPatternOverlay(c, tpl); }
 
     // top accent bar (small brand cue, also makes blank slides look intentional)
     c.fillStyle = tpl.accentColor;
