@@ -19,7 +19,7 @@
   // subscription, set its post-payment redirect to:  <your-domain>/app.html?pro=success
   // then paste the link URL below. Until then, "Get Pro" falls back to Preview.
   // This is the only step that needs the account owner — ~5 minutes, no code.
-  var PRO_CHECKOUT_URL = 'https://buy.stripe.com/test_28E4gy7r79Tw0Az9zbb3q00';
+  var PRO_CHECKOUT_URL = 'https://buy.stripe.com/28E4gy7r79Tw0Az9zbb3q00';
 
   // ── State ──────────────────────────────────────────────────────────────────
   var state = {
