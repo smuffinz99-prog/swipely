@@ -152,6 +152,11 @@
     if (tpl.overlay === 'stained-arch')  { overlayStainedArch(c, col); }
     if (tpl.overlay === 'lattice')       { overlayLattice(c, col); }
     if (tpl.overlay === 'wave-lines')    { overlayWaveLines(c, col); }
+    if (tpl.overlay === 'sunburst')      { overlaySunburst(c, col); }
+    if (tpl.overlay === 'engraving')     { overlayEngraving(c, col); }
+    if (tpl.overlay === 'chevron')       { overlayChevron(c, col); }
+    if (tpl.overlay === 'mandala')       { overlayMandala(c, col); }
+    if (tpl.overlay === 'geometry')      { overlayGeometry(c, col); }
     c.restore();
   }
 
@@ -426,6 +431,178 @@
     c.globalAlpha = 0.62;
     [[m, m], [W - m, m], [W - m, H - m], [m, H - m]].forEach(function (p) {
       c.beginPath(); c.arc(p[0], p[1], 8, 0, Math.PI * 2); c.fill();
+    });
+  }
+
+  // ── Sunburst: alternating wedges + radial spokes + concentric rings ──────────
+  function overlaySunburst(c, col) {
+    c.fillStyle = col; c.strokeStyle = col;
+    var cx = W / 2, cy = H / 2;
+    var maxR = Math.sqrt(W * W + H * H);
+    var numRays = 24;
+    // Alternating filled wedges
+    c.globalAlpha = 0.12;
+    for (var i = 0; i < numRays; i++) {
+      if (i % 2 === 0) {
+        var a1 = (i / numRays) * Math.PI * 2 - Math.PI / 2;
+        var a2 = ((i + 0.88) / numRays) * Math.PI * 2 - Math.PI / 2;
+        c.beginPath(); c.moveTo(cx, cy); c.arc(cx, cy, maxR, a1, a2); c.closePath(); c.fill();
+      }
+    }
+    // Radial spokes
+    c.globalAlpha = 0.20; c.lineWidth = 1.5;
+    for (var j = 0; j < numRays; j++) {
+      var angle = (j / numRays) * Math.PI * 2 - Math.PI / 2;
+      c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(angle) * maxR, cy + Math.sin(angle) * maxR); c.stroke();
+    }
+    // Concentric rings
+    c.globalAlpha = 0.18; c.lineWidth = 2;
+    [120, 240, 360, 480, 620].forEach(function (r) {
+      c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.stroke();
+    });
+    // Filled center hub
+    c.globalAlpha = 0.30; c.beginPath(); c.arc(cx, cy, 44, 0, Math.PI * 2); c.fill();
+    c.globalAlpha = 0.18; c.lineWidth = 2; c.beginPath(); c.arc(cx, cy, 68, 0, Math.PI * 2); c.stroke();
+    // Bold border
+    var m = 60;
+    c.globalAlpha = 0.52; c.lineWidth = 5; c.strokeRect(m, m, W - m * 2, H - m * 2);
+    c.globalAlpha = 0.22; c.lineWidth = 1.5; c.strokeRect(m + 16, m + 16, W - m * 2 - 32, H - m * 2 - 32);
+  }
+
+  // ── Engraving: fine cross-hatch diagonal grid ─────────────────────────────────
+  function overlayEngraving(c, col) {
+    c.strokeStyle = col; c.fillStyle = col; c.lineWidth = 1;
+    var sp = 26, ext = Math.max(W, H) * 1.5, steps = Math.ceil(ext / sp) + 2;
+    // 45° lines
+    c.globalAlpha = 0.14;
+    c.save(); c.translate(W / 2, H / 2); c.rotate(Math.PI / 4);
+    for (var i = -steps; i <= steps; i++) {
+      c.beginPath(); c.moveTo(i * sp, -ext); c.lineTo(i * sp, ext); c.stroke();
+    }
+    c.restore();
+    // −45° lines
+    c.save(); c.translate(W / 2, H / 2); c.rotate(-Math.PI / 4);
+    for (var j = -steps; j <= steps; j++) {
+      c.beginPath(); c.moveTo(j * sp, -ext); c.lineTo(j * sp, ext); c.stroke();
+    }
+    c.restore();
+    // Bold border
+    var m = 60;
+    c.globalAlpha = 0.55; c.lineWidth = 5; c.strokeRect(m, m, W - m * 2, H - m * 2);
+    c.globalAlpha = 0.25; c.lineWidth = 1.5; c.strokeRect(m + 16, m + 16, W - m * 2 - 32, H - m * 2 - 32);
+    // Corner diamonds
+    c.globalAlpha = 0.62;
+    [[m, m], [W - m, m], [W - m, H - m], [m, H - m]].forEach(function (p) {
+      var d = 18; c.beginPath();
+      c.moveTo(p[0], p[1] - d); c.lineTo(p[0] + d, p[1]); c.lineTo(p[0], p[1] + d); c.lineTo(p[0] - d, p[1]); c.closePath(); c.fill();
+    });
+  }
+
+  // ── Chevron: bold zigzag stripe rows ─────────────────────────────────────────
+  function overlayChevron(c, col) {
+    c.strokeStyle = col; c.fillStyle = col; c.lineWidth = 4; c.globalAlpha = 0.26;
+    var depth = 40, segW = 88, rowSp = 62;
+    var numRows = Math.ceil(H / rowSp) + 3;
+    var numSegs = Math.ceil(W / segW) + 3;
+    for (var row = -1; row < numRows; row++) {
+      var y0 = row * rowSp;
+      c.beginPath(); c.moveTo(-segW, y0);
+      for (var seg = 0; seg < numSegs; seg++) {
+        var x = (seg - 1) * segW;
+        c.lineTo(x + segW / 2, y0 - depth);
+        c.lineTo(x + segW, y0);
+      }
+      c.stroke();
+    }
+    var m = 60;
+    c.globalAlpha = 0.52; c.lineWidth = 5; c.strokeRect(m, m, W - m * 2, H - m * 2);
+    c.globalAlpha = 0.22; c.lineWidth = 1.5; c.strokeRect(m + 16, m + 16, W - m * 2 - 32, H - m * 2 - 32);
+    c.globalAlpha = 0.62;
+    [[m, m], [W - m, m], [W - m, H - m], [m, H - m]].forEach(function (p) {
+      c.beginPath(); c.arc(p[0], p[1], 9, 0, Math.PI * 2); c.fill();
+    });
+  }
+
+  // ── Mandala: concentric rings + radial petals + spokes ───────────────────────
+  function overlayMandala(c, col) {
+    c.strokeStyle = col; c.fillStyle = col;
+    var cx = W / 2, cy = H / 2;
+    // Concentric rings
+    c.globalAlpha = 0.22; c.lineWidth = 2.5;
+    [70, 150, 230, 310, 390, 470].forEach(function (r) {
+      c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.stroke();
+    });
+    // 16 radial spokes
+    c.globalAlpha = 0.16; c.lineWidth = 1.5;
+    for (var s = 0; s < 16; s++) {
+      var sa = s * Math.PI / 8;
+      c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(sa) * 470, cy + Math.sin(sa) * 470); c.stroke();
+    }
+    // Petal dots at ring intersections
+    c.globalAlpha = 0.22;
+    [[8, 150], [16, 230], [24, 310]].forEach(function (rp) {
+      for (var k = 0; k < rp[0]; k++) {
+        var a = k * Math.PI * 2 / rp[0];
+        c.beginPath(); c.arc(cx + Math.cos(a) * rp[1], cy + Math.sin(a) * rp[1], rp[1] * 0.078, 0, Math.PI * 2); c.fill();
+      }
+    });
+    // 8 inner elliptical petals
+    c.globalAlpha = 0.16;
+    for (var p = 0; p < 8; p++) {
+      var pa = p * Math.PI / 4;
+      c.beginPath();
+      c.ellipse(cx + Math.cos(pa) * 110, cy + Math.sin(pa) * 110, 30, 13, pa, 0, Math.PI * 2);
+      c.fill();
+    }
+    // Center
+    c.globalAlpha = 0.32; c.beginPath(); c.arc(cx, cy, 36, 0, Math.PI * 2); c.fill();
+    c.globalAlpha = 0.18; c.lineWidth = 2; c.beginPath(); c.arc(cx, cy, 56, 0, Math.PI * 2); c.stroke();
+    // Bold border
+    var m = 60;
+    c.globalAlpha = 0.50; c.lineWidth = 5; c.strokeRect(m, m, W - m * 2, H - m * 2);
+    c.globalAlpha = 0.22; c.lineWidth = 1.5; c.strokeRect(m + 16, m + 16, W - m * 2 - 32, H - m * 2 - 32);
+  }
+
+  // ── Geometry: large corner triangles + fine triangle grid ────────────────────
+  function overlayGeometry(c, col) {
+    c.fillStyle = col; c.strokeStyle = col;
+    // Large bold triangle corners
+    [[0, 0, W * 0.55, 0, 0, H * 0.42, 0.10],
+     [W, 0, W * 0.45, 0, W, H * 0.42, 0.07],
+     [0, H, W * 0.45, H, 0, H * 0.58, 0.10],
+     [W, H, W * 0.55, H, W, H * 0.58, 0.07]].forEach(function (t) {
+      c.globalAlpha = t[6];
+      c.beginPath(); c.moveTo(t[0], t[1]); c.lineTo(t[2], t[3]); c.lineTo(t[4], t[5]); c.closePath(); c.fill();
+    });
+    // Fine triangle tessellation grid
+    c.globalAlpha = 0.15; c.lineWidth = 1.5;
+    var gW = 130, gH = 112, nC = Math.ceil(W / gW) + 2, nR = Math.ceil(H / gH) + 2;
+    for (var row = -1; row < nR; row++) {
+      for (var col2 = -1; col2 < nC; col2++) {
+        var ox = (Math.abs(row) % 2) ? gW / 2 : 0;
+        var tx = col2 * gW + ox, ty = row * gH;
+        c.beginPath(); c.moveTo(tx, ty + gH); c.lineTo(tx + gW / 2, ty); c.lineTo(tx + gW, ty + gH); c.closePath(); c.stroke();
+      }
+    }
+    // Alternate fill on some cells
+    c.globalAlpha = 0.07;
+    for (var r2 = -1; r2 < nR; r2++) {
+      for (var c2 = -1; c2 < nC; c2++) {
+        if ((r2 + c2) % 3 === 0) {
+          var ox2 = (Math.abs(r2) % 2) ? gW / 2 : 0;
+          var tx2 = c2 * gW + ox2, ty2 = r2 * gH;
+          c.beginPath(); c.moveTo(tx2, ty2 + gH); c.lineTo(tx2 + gW / 2, ty2); c.lineTo(tx2 + gW, ty2 + gH); c.closePath(); c.fill();
+        }
+      }
+    }
+    // Bold border
+    var m = 60;
+    c.globalAlpha = 0.52; c.lineWidth = 5; c.strokeRect(m, m, W - m * 2, H - m * 2);
+    c.globalAlpha = 0.22; c.lineWidth = 1.5; c.strokeRect(m + 16, m + 16, W - m * 2 - 32, H - m * 2 - 32);
+    c.globalAlpha = 0.62;
+    [[m, m], [W - m, m], [W - m, H - m], [m, H - m]].forEach(function (p) {
+      var d = 18; c.beginPath();
+      c.moveTo(p[0], p[1] - d); c.lineTo(p[0] + d, p[1]); c.lineTo(p[0], p[1] + d); c.lineTo(p[0] - d, p[1]); c.closePath(); c.fill();
     });
   }
 

@@ -3,6 +3,7 @@
  * overlay (optional): drawn on canvas after bg fill using titleColor at opacity.
  *   'damask' | 'baroque' | 'art-deco' | 'cathedral' | 'manuscript'
  *   'stained-arch' | 'lattice' | 'wave-lines'
+ *   'sunburst' | 'engraving' | 'chevron' | 'mandala' | 'geometry'
  */
 window.TEMPLATES = [
   // ── Free ─────────────────────────────────────────────────────────────────────
@@ -253,6 +254,56 @@ window.TEMPLATES = [
     titleColor: '#70d8f0', bodyColor: '#50b8d0', accentColor: '#40b0d0',
     pageColor: '#208090', brandColor: '#70d8f0', watermarkColor: '#041828',
     overlay: 'wave-lines',
+  },
+  {
+    id: 'sunburst',
+    name: 'Sunburst',
+    pro: true,
+    font: "Georgia, 'Times New Roman', serif",
+    bg: { type: 'solid', color: '#0c0008' },
+    titleColor: '#f0b830', bodyColor: '#c88a10', accentColor: '#f0b830',
+    pageColor: '#8a5810', brandColor: '#f0b830', watermarkColor: '#2a1804',
+    overlay: 'sunburst',
+  },
+  {
+    id: 'engraving',
+    name: 'Engraving',
+    pro: true,
+    font: "Georgia, 'Times New Roman', serif",
+    bg: { type: 'solid', color: '#060810' },
+    titleColor: '#c0d0e8', bodyColor: '#8090b8', accentColor: '#c0d0e8',
+    pageColor: '#506080', brandColor: '#c0d0e8', watermarkColor: '#0e1428',
+    overlay: 'engraving',
+  },
+  {
+    id: 'chevron',
+    name: 'Chevron',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'solid', color: '#080f0a' },
+    titleColor: '#58e890', bodyColor: '#30c060', accentColor: '#58e890',
+    pageColor: '#1a8040', brandColor: '#58e890', watermarkColor: '#041808',
+    overlay: 'chevron',
+  },
+  {
+    id: 'mandala',
+    name: 'Mandala',
+    pro: true,
+    font: "Georgia, 'Times New Roman', serif",
+    bg: { type: 'solid', color: '#060028' },
+    titleColor: '#c8b0f0', bodyColor: '#9878d0', accentColor: '#c8b0f0',
+    pageColor: '#6840a8', brandColor: '#c8b0f0', watermarkColor: '#1a0050',
+    overlay: 'mandala',
+  },
+  {
+    id: 'geometry',
+    name: 'Geometry',
+    pro: true,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#0a0808', to: '#180a04', angle: 135 },
+    titleColor: '#e86830', bodyColor: '#c04818', accentColor: '#e86830',
+    pageColor: '#803010', brandColor: '#e86830', watermarkColor: '#200804',
+    overlay: 'geometry',
   },
 ];
 
