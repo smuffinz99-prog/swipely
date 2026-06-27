@@ -10,7 +10,7 @@
   var W = 1080, H = 1350;         // export resolution (4:5 portrait)
   var STORAGE_KEY = 'swipely.project.v1';
   var USAGE_KEY = 'swipely.usage.v1';
-  var FREE_DAILY_EXPORTS = 2;     // free plan: carousels (downloads) per day before Pro
+  var FREE_DAILY_EXPORTS = 1;     // free plan: carousels (downloads) per day before Pro
   var PRO_PRICE = '$6';           // Pro price, shown in the upsell + watermark note
   var PRO_KEY = 'swipely.pro.v1'; // persisted Pro flag (survives reloads, separate from project)
 
