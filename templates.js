@@ -44,6 +44,52 @@ window.TEMPLATES = [
     pageColor: '#6ee7b7', brandColor: '#064e3b', watermarkColor: '#a7f3d0',
   },
 
+  {
+    id: 'navy',
+    name: 'Navy',
+    pro: false,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'solid', color: '#0a1628' },
+    titleColor: '#f8fafc', bodyColor: '#94a3b8', accentColor: '#f59e0b',
+    pageColor: '#475569', brandColor: '#f8fafc', watermarkColor: '#1e3a5f',
+  },
+  {
+    id: 'blush',
+    name: 'Blush',
+    pro: false,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'solid', color: '#fff1f2' },
+    titleColor: '#881337', bodyColor: '#be123c', accentColor: '#f43f5e',
+    pageColor: '#fda4af', brandColor: '#881337', watermarkColor: '#fecdd3',
+  },
+  {
+    id: 'forest',
+    name: 'Forest',
+    pro: false,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'solid', color: '#052e16' },
+    titleColor: '#f0fdf4', bodyColor: '#86efac', accentColor: '#4ade80',
+    pageColor: '#166534', brandColor: '#f0fdf4', watermarkColor: '#14532d',
+  },
+  {
+    id: 'slate',
+    name: 'Slate',
+    pro: false,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'gradient', from: '#334155', to: '#1e293b', angle: 160 },
+    titleColor: '#f1f5f9', bodyColor: '#cbd5e1', accentColor: '#7dd3fc',
+    pageColor: '#64748b', brandColor: '#f1f5f9', watermarkColor: '#475569',
+  },
+  {
+    id: 'amber',
+    name: 'Amber',
+    pro: false,
+    font: "'Segoe UI', system-ui, sans-serif",
+    bg: { type: 'solid', color: '#fffbeb' },
+    titleColor: '#78350f', bodyColor: '#92400e', accentColor: '#d97706',
+    pageColor: '#fcd34d', brandColor: '#78350f', watermarkColor: '#fde68a',
+  },
+
   // ── Pro: Cute & Pastel ────────────────────────────────────────────────────────
   {
     id: 'sunset',
